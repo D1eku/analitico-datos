@@ -111,3 +111,4 @@ for row in new_dataset.iterrows():
     conn.commit()
 
     cur.execute(query7,(idFactura, precioUnitario, cantidad, impuesto5, total, fecha, hora, cobv, porceMargenBruto, porceIngreso, calificacion, lineaProducto, tipoPago, tipo_cliente, genero, rama, ciudad))
+    conn.commit()
