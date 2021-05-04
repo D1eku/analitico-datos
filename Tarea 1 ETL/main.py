@@ -51,7 +51,171 @@ def create_tables(cur, conn, exists):
                                            ciudad integer not null references Ciudad(id));""")
     conn.commit()
     
+def create_triggers(cur,conn, exists_database):
+    query_trigger1 = """
+    create or replace function verificar_ciudad() returns trigger
+    as
+    $$
+    declare
+        rec record;
+    begin
+        for rec in (select * from ciudad) loop
+            if rec.ciudad = new.ciudad then
+                return NULL;
+            end if;
+        end loop;
+        return new;
+    end;
+    $$
+    language plpgsql;
 
+    create trigger t_verificar_ciudad before insert on ciudad
+    for each row
+    execute procedure verificar_ciudad();
+
+    --------------
+
+    create or replace function verificar_genero() returns trigger
+    as
+    $$
+    declare
+        rec record;
+    begin
+        for rec in (select * from genero) loop
+            if rec.genero = new.genero then
+                return NULL;
+            end if;
+        end loop;
+        return new;
+    end;
+    $$
+    language plpgsql;
+
+    create trigger t_verificar_genero before insert on genero
+    for each row
+    execute procedure verificar_genero();
+
+    --------------
+
+    create or replace function verificar_linea_producto() returns trigger
+    as
+    $$
+    declare
+        rec record;
+    begin
+        for rec in (select * from linea_producto) loop
+            if rec."linea_producto" = new."linea_producto" then
+                return NULL;
+            end if;
+        end loop;
+        return new;
+    end;
+    $$
+    language plpgsql;
+
+    create trigger t_verificar_linea_producto before insert on linea_producto
+    for each row
+    execute procedure verificar_linea_producto();
+
+    --------------
+
+    create or replace function verificar_rama() returns trigger
+    as
+    $$
+    declare
+        rec record;
+    begin
+        for rec in (select * from rama) loop
+            if rec.rama = new.rama then
+                return NULL;
+            end if;
+        end loop;
+        return new;
+    end;
+    $$
+    language plpgsql;
+
+    create trigger t_verificar_rama before insert on rama
+    for each row
+    execute procedure verificar_rama();
+
+    --------------
+
+    create or replace function verificar_tipo_cliente() returns trigger
+    as
+    $$
+    declare
+        rec record;
+    begin
+        for rec in (select * from tipo_cliente) loop
+            if rec.tipo = new.tipo then
+                return NULL;
+            end if;
+        end loop;
+        return new;
+    end;
+    $$
+    language plpgsql;
+
+    create trigger t_verificar_tipo_cliente before insert on tipo_cliente
+    for each row
+    execute procedure verificar_tipo_cliente();
+
+    --------------
+
+    create or replace function verificar_tipo_pago() returns trigger
+    as
+    $$
+    declare
+        rec record;
+    begin
+        for rec in (select * from tipo_pago) loop
+            if rec."tipo_pago" = new."tipo_pago" then
+                return NULL;
+            end if;
+        end loop;
+        return new;
+    end;
+    $$
+    language plpgsql;
+
+    create trigger t_verificar_tipo_pago before insert on tipo_pago
+    for each row
+    execute procedure verificar_tipo_pago();
+
+    --------------
+
+    create or replace procedure agregar_factura_python(id_f text, prec_uni double precision, cant int, impu double precision, total double precision,
+                                                    fecha date, hora time, cobv double precision, porc_mar_bru double precision, porc_ing double precision,
+                                                    califi double precision, li_produ text, ti_pago text, ti_cli text, gen text, ram char, ciu text)
+    as
+    $$
+    declare
+        id_li_produ int;
+        id_ti_pago int;
+        id_ti_cli int;
+        id_gen int;
+        id_rama int;
+        id_ciu int;
+    begin
+        select lp.id into id_li_produ from linea_producto lp where lp."linea_producto" = li_produ;
+        select tp.id into id_ti_pago from tipo_pago tp where tp."tipo_pago" = ti_pago;
+        select tc.id into id_ti_cli from tipo_cliente tc where tc.tipo = ti_cli;
+        select ge.id into id_gen from genero ge where ge.genero = gen;
+        select ra.id into id_rama from rama ra where ra.rama = ram;
+        select ci.id into id_ciu from ciudad ci where ci.ciudad = ciu;
+        insert into factura(id, precio_unitario, cantidad, impuesto, total, fecha, hora, cobv,
+                            porcentaje_margen_bruto, porcentaje_ingreso, calificacion,
+                            linea_producto, tipo_pago, tipo_cliente, genero, rama, ciudad)
+        values (id_f, prec_uni, cant, impu, total, fecha, hora, cobv, porc_mar_bru, porc_ing, califi,
+                id_li_produ, id_ti_pago, id_ti_cli, id_gen, id_rama, id_ciu);
+    end;
+    $$
+    language plpgsql;
+        
+    """
+    cur.execute(query_trigger1)
+    conn.commit()
 
 dataset = pd.read_csv("dataset1.csv")
 
@@ -69,6 +233,8 @@ exists_database = create_database(database_name, conn)
 conn = pg.connect(host="localhost", user="postgres", password="password", database=database_name)
 cur = conn.cursor()
 create_tables(cur, conn, exists_database)
+
+create_triggers(cur,conn, exists_database)
 
 query1 = "insert into rama(rama) values(%s)"
 query2 = "insert into linea_producto(linea_producto) values(%s)"
@@ -112,3 +278,4 @@ for row in new_dataset.iterrows():
 
     cur.execute(query7,(idFactura, precioUnitario, cantidad, impuesto5, total, fecha, hora, cobv, porceMargenBruto, porceIngreso, calificacion, lineaProducto, tipoPago, tipo_cliente, genero, rama, ciudad))
     conn.commit()
+
