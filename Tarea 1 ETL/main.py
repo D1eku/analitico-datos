@@ -69,3 +69,45 @@ exists_database = create_database(database_name, conn)
 conn = pg.connect(host="localhost", user="postgres", password="password", database=database_name)
 cur = conn.cursor()
 create_tables(cur, conn, exists_database)
+
+query1 = "insert into rama(rama) values(%s)"
+query2 = "insert into linea_producto(linea_producto) values(%s)"
+query3 = "insert into ciudad(ciudad) values(%s)"
+query4 = "insert into tipo_pago(tipo_pago) values(%s)"
+query5 = "insert into tipo_cliente(tipo) values(%s)"
+query6 = "insert into genero(genero) values(%s)"
+query7 = "call agregar_factura_python(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+
+for row in new_dataset.iterrows():
+    idFactura = row[1][0]
+    ciudad = row[1][1]
+    rama = row[1][2]
+    tipo_cliente = row[1][3]
+    genero = row[1][4]
+    lineaProducto = row[1][5]
+    tipoPago = row[1][6]
+    cantidad = row[1][7]
+    precioUnitario = row[1][8]
+    impuesto5 = row[1][9]
+    total = row[1][10]
+    cobv = row[1][11]
+    porceMargenBruto = row[1][12]
+    porceIngreso = row[1][13]
+    fecha = row[1][14]
+    hora = row[1][15]
+    calificacion = row[1][16]
+    
+    cur.execute(query1,(rama))
+    conn.commit()
+    cur.execute(query2,(lineaProducto,))
+    conn.commit()
+    cur.execute(query3,(ciudad,))
+    conn.commit()
+    cur.execute(query4,(tipoPago,))
+    conn.commit()
+    cur.execute(query5,(tipo_cliente,))
+    conn.commit()
+    cur.execute(query6,(genero,))
+    conn.commit()
+
+    cur.execute(query7,(idFactura, precioUnitario, cantidad, impuesto5, total, fecha, hora, cobv, porceMargenBruto, porceIngreso, calificacion, lineaProducto, tipoPago, tipo_cliente, genero, rama, ciudad))
