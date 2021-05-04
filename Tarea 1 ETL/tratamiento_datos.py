@@ -1,5 +1,11 @@
 import pandas as pd
 
+#Funcion que cambia el formato de la fecha para la columna DATE
+def change_dateform(val):
+    date_splited = val.split('/')
+    new_order = date_splited[1]+"-"+date_splited[0]+"-"+date_splited[2]
+    return new_order
+
 # Funcion para cambiar los valores de gender
 def change_gender(val):
     if (val == 'Male'):
@@ -52,6 +58,10 @@ def tratar_dataset(dataset):
 
     # Payment
     dataset['Payment'] = dataset['Payment'].transform(change_payment)
+    
+    #Date
+    dataset['Date'] = dataset['Date'].transform(change_dateform)
+
 
     #Nombre de las cabeceras del data set
     columnas2 = dataset[
