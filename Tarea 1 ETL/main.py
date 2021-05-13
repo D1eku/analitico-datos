@@ -226,11 +226,11 @@ new_dataset = tratar_dataset(dataset)
 print('==============================================================================================')
 print(new_dataset)
 
-conn = pg.connect(host='localhost', user='postgres', password='password')   
+conn = pg.connect(host='localhost', user='postgres', password='postgres')   
 conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
 database_name = "Data_Set_Supermercado"
 exists_database = create_database(database_name, conn)
-conn = pg.connect(host="localhost", user="postgres", password="password", database=database_name)
+conn = pg.connect(host="localhost", user="postgres", password="postgres", database=database_name)
 cur = conn.cursor()
 create_tables(cur, conn, exists_database)
 
