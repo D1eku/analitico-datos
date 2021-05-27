@@ -4,26 +4,21 @@ from google_trans_new import google_translator
 
 # Rellena los valores NaN
 def fill_NaN(df):
-    return df.fillna({"Invoice ID": "No-ID", "Branch": "No-Branch", "City": "No-City", "Customer type": "No-C_Type", "Gender": "No-Gender", "Product line": "No-Prod_Line", "Unit price": -1, "Quantity": -1, "Tax 5%": -1, "Total": -1, "Date": "No-Date", "Time": "No-Time", "Payment": "No-Payment", "cogs": -1, "gross margin percentage": -1, "gross income": -1, "Rating": "No-Rating"})
-
-def fill_other_values(df):
-    for row in range(0, len(df)):
-        if(df.loc[row, "Quantity"] == "ACÁ"):
-            df.loc[row, "Quantity"] = str(-1)
-        if(df.loc[row, "Total"] == "ESTOY"):
-            df.loc[row, "Total"] = str(-1)
-        if(df.loc[row, "gross income"] == "Hola" ):
-            df.loc[row, "gross income"] = str(-1)
-        
+    df = df.fillna({"Invoice ID": "No-ID", "Branch": "No-Branch", "City": "No-City", "Customer type": "No-C_Type", "Gender": "No-Gender", "Product line": "No-Prod_Line", "Unit price": -1, "Quantity": -1, "Tax 5%": -1, "Total": -1, "Date": "No-Date", "Time": "No-Time", "Payment": "No-Payment", "cogs": -1, "gross margin percentage": -1, "gross income": -1, "Rating": "No-Rating"})
     df["Quantity"] = df["Quantity"].astype("int64")
     df["Total"] = df["Total"].astype("float64")
-    df["gross income"] = df["gross income"].astype("float64")
-       
+    df["gross income"] = df["gross income"].astype("float64") 
+    return df
+
+def fill_other_values_with_NaN(df):
+    df["Quantity"] = pd.to_numeric(df["Quantity"], errors='coerce')     
+    df["Total"] = pd.to_numeric(df["Total"], errors='coerce') 
+    df["gross income"] = pd.to_numeric(df["gross income"], errors='coerce')   
     return df
 
 def data_cleaning(df):
+    df = fill_other_values_with_NaN(df)
     df = fill_NaN(df)
-    df = fill_other_values(df)
     return df
     
 
