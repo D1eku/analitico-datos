@@ -4,7 +4,7 @@ from google_trans_new import google_translator
 
 # Rellena los valores NaN
 def fill_NaN(df):
-    df = df.fillna({"Invoice ID": "No-ID", "Branch": "No-Branch", "City": "No-City", "Customer type": "No-C_Type", "Gender": "No-Gender", "Product line": "No-Prod_Line", "Unit price": -1, "Quantity": -1, "Tax 5%": -1, "Total": -1, "Date": "No-Date", "Time": "No-Time", "Payment": "No-Payment", "cogs": -1, "gross margin percentage": -1, "gross income": -1, "Rating": "No-Rating"})
+    df = df.fillna({"Invoice ID": "No-ID", "Branch": "No-Branch", "City": "No-City", "Customer type": "No-C_Type", "Gender": "No-Gender", "Product line": "No-Prod_Line", "Unit price": -1, "Quantity": -1, "Tax 5%": -1, "Total": -1, "Date": "No-Date", "Time": "No-Time", "Payment": "No-Payment", "cogs": -1, "gross margin percentage": -1, "gross income": -1, "Rating": 0})
     df["Quantity"] = df["Quantity"].astype("int64")
     df["Total"] = df["Total"].astype("float64")
     df["gross income"] = df["gross income"].astype("float64") 
