@@ -1,6 +1,6 @@
 import pandas as pd
 import random
-from google_trans_new import google_translator
+from google_trans_new import google_translator #pip install google-trans-new
 
 # Rellena los valores NaN
 def fill_NaN(df):
