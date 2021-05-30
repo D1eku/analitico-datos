@@ -45,8 +45,10 @@ def cread_db( dataset):
     import sqlalchemy as sa
     from sqlalchemy.ext import declarative
     from uuid import uuid4
+    from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 
-    conn = pg.connect(host='localhost', user='postgres', password='postgres')   
+    conn = pg.connect(host='localhost', user='postgres', password='postgres')  
+    conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
     cur = conn.cursor()
     cur.execute("select exists (select * from pg_catalog.pg_database WHERE datname = 'supermarket2');")
     existe = cur.fetchone()[0]
