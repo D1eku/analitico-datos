@@ -1,0 +1,41 @@
+create table product_dimension(
+        id int primary key,
+        product_line text not null,
+        branch char not null
+    );
+
+    create table customer_dimension(
+        id int primary key,
+        gender text not null,
+        customer_type text not null,
+        payment text not null
+    );
+
+    create table time_dimension(
+        id int primary key,
+        date date not null,
+        time time not null
+    );
+
+    create table city_dimension(
+        id int primary key,
+        city text not null
+    );
+    
+    create table invoice_fact(
+        id TEXT PRIMARY KEY,
+        unit_price float not null,
+        quantity int not null,
+        tax_5_percentage float not null,
+        total float not null,
+        cogs float not null,
+        rating float not null,
+        customer_id int not null,
+        product_id int not null,
+        time_id int not null,
+        city_id int not null,
+        foreign key(customer_id) references customer_dimension(id),
+        foreign key(product_id) references product_dimension(id),
+        foreign key(time_id) references time_dimension(id),
+        foreign key(city_id) references city_dimension(id)
+    );
