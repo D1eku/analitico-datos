@@ -68,16 +68,17 @@ create table game_dimension(
 );
 
 create table author_dimension(
-	steam_id int  primary key,
+	steamid int  primary key,
 	num_games_owned int not null,
 	num_reviews int not null,
 	playtime_forever float not null,
 	playtime_last_two_weeks float not null,
 	playtime_at_review float not null,
-	last_time_played float not null,
 	steam_purchase boolean not null,
 	received_for_free boolean not null
 );
+
+
 
 create table review_fact(
 	review_id int primary key,
