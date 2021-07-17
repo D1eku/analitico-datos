@@ -112,15 +112,20 @@ toDelete = ['DemoCount','DeveloperCount', 'MovieCount',
 
 for to in toDelete:
     del newGameFeatures[to]
-    
+
+cols = newGameFeatures['ResponseID']#Obten las id que si se insertaron
+gfdf = gfdf[gfdf['ResponseID'].isin(cols) == False] #Elimina todas las filas que tengan una id igual a alguna insertada
+gfdf = gfdf.drop_duplicates(subset=['ResponseID']) #Elimina los duplicados de este dataset
+
 tiempoFinalReduccion1 = time() - tiempoInicialReduccion
 print("Tiempo que tomo reducir el archivo GameFeatures: ", tiempoConvSTR(tiempoFinalReduccion1))
 
 #Crea un nuevo archivo csv y muestra cuanto tiempo tomo eso.
 tiempoInicialEscribirGameFeaturesCSV = time()
 newGameFeatures.to_csv('final-game-features.csv', index=False)#Escribe el archivo
+gfdf.to_csv('deletedGameFeatures.csv', index=False)
 tiempoFinalEscribirGameFeaturesCSV = time() - tiempoInicialEscribirGameFeaturesCSV
-print("Tiempo de escritura de nuevo GameFeaturesCSV: ", tiempoConvSTR(tiempoFinalEscribirGameFeaturesCSV))
+print("Tiempo de escritura de nuevo GameFeaturesCSV y guardar los Eliminados: ", tiempoConvSTR(tiempoFinalEscribirGameFeaturesCSV))
 tiempoTotalReduccionArchivoGameFeatures = time() - tiempoInicialReduccion 
 print("Tiempo total de ejecucion para tratar y guardar GameFeatures: ", tiempoConvSTR(tiempoTotalReduccionArchivoGameFeatures))
 requiredID = newGameFeatures['ResponseID']#Id de los juegos que se seleccionaran en el steam reviews
@@ -138,6 +143,10 @@ toDeleteReviews = ['Unnamed: 0', 'weighted_vote_score', 'author.last_played']
 for to in toDeleteReviews:
     del reviewsGameExistInFeatures[to]
 
+cols = reviewsGameExistInFeatures['review_id']#Obten las id que si se insertaron
+esrdf = esrdf[esrdf['review_id'].isin(cols) == False] #Elimina todas las filas que tengan una id igual a alguna insertada
+esrdf = esrdf.drop_duplicates(subset=['review_id']) #Elimina los duplicados de este dataset
+esrdf.to_csv('deletedSteamReviews.csv', index=False)
 
 #Libera la memoria.
 del [[esrdf]]
@@ -165,7 +174,7 @@ print("Tiempo total reduccion ambos archivos: ", tiempoConvSTR(tiempoReduccion2)
 
 def uploadToDB(newGameFeatures, reviewsGameExistInFeatures):
 
-    conn = pg.connect(host='localhost', user='postgres', password='postgres')  
+    conn = pg.connect(host='localhost', user='postgres', password='postgresql')  
     conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
     cur = conn.cursor()
     cur.execute("select exists (select * from pg_catalog.pg_database WHERE datname = 'etl3');")
@@ -187,7 +196,7 @@ def uploadToDB(newGameFeatures, reviewsGameExistInFeatures):
 
     cur.execute('create database etl3')
 
-    engine = sa.create_engine('postgresql://postgres:postgres@localhost/etl3')
+    engine = sa.create_engine('postgresql://postgres:postgresql@localhost/etl3')
     conn = engine.connect()
     conn.execute('commit')
 
@@ -233,6 +242,10 @@ def uploadToDB(newGameFeatures, reviewsGameExistInFeatures):
     del [[reviewFact]]
     gc.collect()
 
+    deletedGF = pd.read_csv('deletedGameFeatures.csv', delimiter=",")
+    deletedGF.to_sql('deleted_game_features', conn, if_exists='append', index=False, chunksize=350000)
+    deletedSR = pd.read_csv('deletedSteamReviews.csv', delimiter=",")
+    deletedSR.to_sql('deleted_steam_reviews', conn, if_exists='append', index=False, chunksize=350000)
 
     #Agrega constraint a la BD.
 
